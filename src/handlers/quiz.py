@@ -1,6 +1,6 @@
 """Обработчики для тестов"""
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 
 from src.database.base import get_db_session
 from src.services.user_service import get_user

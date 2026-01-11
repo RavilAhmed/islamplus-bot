@@ -7,20 +7,18 @@ from src.database.models import UserSkill
 
 def get_practice_keyboard() -> InlineKeyboardMarkup:
     """Главное меню практики"""
-    keyboard = InlineKeyboardMarkup(row_width=2)
     buttons = [
-        InlineKeyboardButton("🎯 Сегодняшний фокус", callback_data="practice_focus"),
-        InlineKeyboardButton("📋 Мои навыки", callback_data="practice_skills"),
-        InlineKeyboardButton("➕ Добавить навык", callback_data="practice_add"),
-        InlineKeyboardButton("🔙 Назад", callback_data="menu_main"),
+        [InlineKeyboardButton("🎯 Сегодняшний фокус", callback_data="practice_focus")],
+        [InlineKeyboardButton("📋 Мои навыки", callback_data="practice_skills")],
+        [InlineKeyboardButton("➕ Добавить навык", callback_data="practice_add")],
+        [InlineKeyboardButton("🔙 Назад", callback_data="menu_main")],
     ]
-    keyboard.add(*buttons)
-    return keyboard
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 def get_skills_keyboard(user_skills: List[UserSkill], show_complete: bool = False) -> InlineKeyboardMarkup:
     """Список навыков пользователя"""
-    keyboard = InlineKeyboardMarkup(row_width=1)
+    buttons = []
     
     for user_skill in user_skills:
         if user_skill.status == "completed" and not show_complete:
@@ -34,13 +32,11 @@ def get_skills_keyboard(user_skills: List[UserSkill], show_complete: bool = Fals
         if user_skill.status == "active":
             callback_data = f"skill_complete:{user_skill.skill_id}"
         
-        keyboard.add(InlineKeyboardButton(button_text, callback_data=callback_data))
+        buttons.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
     
-    keyboard.add(
-        InlineKeyboardButton("🔙 Назад", callback_data="menu_practice"),
-    )
+    buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="menu_practice")])
     
-    return keyboard
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 def get_focus_keyboard(
@@ -49,7 +45,7 @@ def get_focus_keyboard(
     max_selection: int = 5,
 ) -> InlineKeyboardMarkup:
     """Выбор навыков для фокуса"""
-    keyboard = InlineKeyboardMarkup(row_width=1)
+    buttons = []
     
     for user_skill in available_skills:
         if user_skill.status != "active":
@@ -66,11 +62,11 @@ def get_focus_keyboard(
         else:
             continue  # Пропускаем, если достигнут лимит
         
-        keyboard.add(InlineKeyboardButton(button_text, callback_data=callback_data))
+        buttons.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
     
-    keyboard.add(
+    buttons.append([
         InlineKeyboardButton("💾 Сохранить фокус", callback_data="focus_save"),
         InlineKeyboardButton("🔙 Назад", callback_data="menu_practice"),
-    )
+    ])
     
-    return keyboard
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

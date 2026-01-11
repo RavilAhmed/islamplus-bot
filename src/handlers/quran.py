@@ -2,7 +2,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from pathlib import Path
-import os
 
 router = Router()
 

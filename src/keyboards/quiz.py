@@ -1,0 +1,75 @@
+"""Клавиатуры для тестов"""
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from typing import List, Optional
+
+
+def get_quiz_mode_keyboard(categories: Optional[List[str]] = None) -> InlineKeyboardMarkup:
+    """Выбор режима теста"""
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    
+    buttons = [
+        InlineKeyboardButton("♾️ Бесконечный вызов", callback_data="test:infinite"),
+        InlineKeyboardButton("📅 Ежедневная викторина", callback_data="test:daily"),
+    ]
+    
+    if categories:
+        buttons.append(
+            InlineKeyboardButton("📚 Тематический раунд", callback_data="test:category_menu")
+        )
+    
+    keyboard.add(*buttons)
+    keyboard.add(InlineKeyboardButton("🔙 Назад", callback_data="menu_main"))
+    
+    return keyboard
+
+
+def get_quiz_category_keyboard(categories: List[str]) -> InlineKeyboardMarkup:
+    """Выбор категории теста"""
+    keyboard = InlineKeyboardMarkup(row_width=2)
+    
+    category_names = {
+        "aqeedah": "Акыда",
+        "fiqh": "Фикх",
+        "sira": "Сира",
+        "quran": "Коран",
+        "ethics": "Этика",
+    }
+    
+    for category in categories:
+        name = category_names.get(category, category.title())
+        keyboard.add(
+            InlineKeyboardButton(name, callback_data=f"test:category:{category}")
+        )
+    
+    keyboard.add(InlineKeyboardButton("🔙 Назад", callback_data="menu_test"))
+    
+    return keyboard
+
+
+def get_quiz_question_keyboard(
+    question_id: int,
+    options: List[str],
+    show_explanation: bool = False,
+) -> InlineKeyboardMarkup:
+    """Клавиатура вопроса теста"""
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    
+    for idx, option in enumerate(options):
+        keyboard.add(
+            InlineKeyboardButton(
+                f"{chr(65 + idx)}. {option}",
+                callback_data=f"answer:{question_id}:{idx}",
+            )
+        )
+    
+    if show_explanation:
+        keyboard.add(
+            InlineKeyboardButton("❓ Объяснение", callback_data=f"quiz_explanation:{question_id}")
+        )
+    
+    keyboard.add(
+        InlineKeyboardButton("⏭️ Следующий вопрос", callback_data=f"quiz_next:{question_id}"),
+        InlineKeyboardButton("🔙 Назад", callback_data="menu_test"),
+    )
+    
+    return keyboard

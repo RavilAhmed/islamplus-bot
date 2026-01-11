@@ -1,6 +1,6 @@
 """Обработчики для Корана и лекций"""
 from aiogram import Router, F
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from pathlib import Path
 import os
 
@@ -44,7 +44,7 @@ async def cmd_listen_quran(message: Message):
 
 
 @router.callback_query(F.data == "quran_assaadi")
-async def callback_quran_assaadi(callback):
+async def callback_quran_assaadi(callback: CallbackQuery):
     """Толкование Корана ас-Саади"""
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -64,7 +64,7 @@ async def callback_quran_assaadi(callback):
 
 
 @router.callback_query(F.data.startswith("sura_"))
-async def callback_sura(callback):
+async def callback_sura(callback: CallbackQuery):
     """Обработка выбора суры"""
     sura_num = callback.data.split("_")[1]
     

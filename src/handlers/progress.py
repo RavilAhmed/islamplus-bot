@@ -7,7 +7,6 @@ from src.services.user_service import get_user
 from src.services.course_service import get_user_course_progress, get_active_courses
 from src.services.skill_service import get_active_user_skills
 from src.services.quiz_service import get_user_quiz_progress
-from src.keyboards.main_menu import get_main_menu_keyboard
 
 router = Router()
 

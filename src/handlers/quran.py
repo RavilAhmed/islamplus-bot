@@ -1,7 +1,10 @@
 """Обработчики для Корана и лекций"""
+import logging
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 router = Router()
 
@@ -77,15 +80,22 @@ async def callback_sura(callback: CallbackQuery):
     text = f"🎧 Сура {sura_num}\n«{sura['name_ar']}» — «{sura['name_ru']}»"
     
     if audio_path.exists():
-        audio_file = FSInputFile(audio_path)
-        await callback.message.delete()
-        await callback.message.answer_audio(
-            audio=audio_file,
-            title=f"Сура {sura_num}. {sura['name_ar']}",
-            performer="Толкование ас-Саади",
-            caption=text,
-        )
-        await callback.answer()
+        try:
+            audio_file = FSInputFile(audio_path)
+            await callback.message.delete()
+            await callback.message.answer_audio(
+                audio=audio_file,
+                title=f"Сура {sura_num}. {sura['name_ar']}",
+                performer="Толкование ас-Саади",
+                caption=text,
+            )
+            await callback.answer()
+        except Exception as e:
+            logger.error(f"Ошибка отправки аудиофайла {sura['file']}: {e}", exc_info=True)
+            await callback.message.edit_text(
+                f"{text}\n\n❌ Ошибка отправки файла. Файл слишком большой (максимум 50MB для Telegram).\n\nРазмер файла: {audio_path.stat().st_size / (1024*1024):.1f} MB",
+            )
+            await callback.answer("Ошибка отправки файла", show_alert=True)
     else:
         await callback.message.edit_text(
             f"{text}\n\n❌ Аудиофайл не найден: {audio_path}",

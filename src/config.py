@@ -11,6 +11,7 @@ class Config:
     
     # Telegram
     BOT_TOKEN: str = os.getenv("BOT_TOKEN", "")
+    BOT_API_URL: str = os.getenv("BOT_API_URL", "")  # Локальный Bot API (если используется)
     
     # База данных
     DATABASE_URL: str = os.getenv(

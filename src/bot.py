@@ -44,10 +44,16 @@ async def main():
         return
     
     # Создание бота и диспетчера
-    bot = Bot(
-        token=config.BOT_TOKEN,
-        default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
-    )
+    bot_kwargs = {
+        "token": config.BOT_TOKEN,
+        "default": DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
+    }
+    # Используем локальный Bot API, если указан
+    if config.BOT_API_URL:
+        bot_kwargs["base_url"] = config.BOT_API_URL
+        logger.info(f"Используется локальный Bot API: {config.BOT_API_URL}")
+    
+    bot = Bot(**bot_kwargs)
     dp = Dispatcher()
     
     # Регистрация обработчиков

@@ -86,12 +86,12 @@ async def callback_sura(callback):
             performer="Толкование ас-Саади",
             caption=text,
         )
+        await callback.answer()
     else:
-        await callback.message.answer(
+        await callback.message.edit_text(
             f"{text}\n\n❌ Аудиофайл не найден: {audio_path}",
         )
-    
-    await callback.answer()
+        await callback.answer("Аудиофайл не найден", show_alert=True)
 
 
 def register_quran_handlers(dp):

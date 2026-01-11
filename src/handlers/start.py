@@ -49,8 +49,9 @@ async def cmd_menu(message: Message):
 @router.callback_query(F.data == "menu_main")
 async def callback_menu_main(callback: CallbackQuery):
     """Возврат в главное меню"""
-    menu_text = "🏠 Главное меню:\n\nВыберите раздел:"
-    await callback.message.edit_text(menu_text, reply_markup=get_main_menu_keyboard())
+    menu_text = "🏠 Главное меню:\n\nВыберите раздел из меню ниже:"
+    await callback.message.delete()
+    await callback.message.answer(menu_text, reply_markup=get_main_menu_keyboard())
     await callback.answer()
 
 

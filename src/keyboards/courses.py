@@ -12,10 +12,10 @@ def get_courses_keyboard(courses: List[Course], back_button: bool = False) -> In
     for course in courses:
         icon = course.icon or "📖"
         button_text = f"{icon} {course.title}"
-        buttons.append([InlineKeyboardButton(button_text, callback_data=f"course:{course.id}")])
+        buttons.append([InlineKeyboardButton(text=button_text, callback_data=f"course:{course.id}")])
     
     if back_button:
-        buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="menu_main")])
+        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="menu_main")])
     
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -25,13 +25,13 @@ def get_course_detail_keyboard(course_id: int, is_started: bool = False) -> Inli
     buttons = []
     
     if is_started:
-        buttons.append([InlineKeyboardButton("📖 Продолжить", callback_data=f"course_continue:{course_id}")])
+        buttons.append([InlineKeyboardButton(text="📖 Продолжить", callback_data=f"course_continue:{course_id}")])
     else:
-        buttons.append([InlineKeyboardButton("▶️ Начать курс", callback_data=f"start_course:{course_id}")])
+        buttons.append([InlineKeyboardButton(text="▶️ Начать курс", callback_data=f"start_course:{course_id}")])
     
     buttons.append([
-        InlineKeyboardButton("🔙 Назад", callback_data="menu_courses"),
-        InlineKeyboardButton("📋 Описание", callback_data=f"course_desc:{course_id}"),
+        InlineKeyboardButton(text="🔙 Назад", callback_data="menu_courses"),
+        InlineKeyboardButton(text="📋 Описание", callback_data=f"course_desc:{course_id}"),
     ])
     
     return InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -42,11 +42,11 @@ def get_lesson_keyboard(lesson_id: int, course_id: int, is_completed: bool = Fal
     buttons = []
     
     if not is_completed:
-        buttons.append([InlineKeyboardButton("✅ Изучил", callback_data=f"lesson_studied:{lesson_id}")])
+        buttons.append([InlineKeyboardButton(text="✅ Изучил", callback_data=f"lesson_studied:{lesson_id}")])
     
     buttons.append([
-        InlineKeyboardButton("🔙 К курсу", callback_data=f"course:{course_id}"),
-        InlineKeyboardButton("📋 Вопросы", callback_data=f"lesson_quiz:{lesson_id}"),
+        InlineKeyboardButton(text="🔙 К курсу", callback_data=f"course:{course_id}"),
+        InlineKeyboardButton(text="📋 Вопросы", callback_data=f"lesson_quiz:{lesson_id}"),
     ])
     
     return InlineKeyboardMarkup(inline_keyboard=buttons)

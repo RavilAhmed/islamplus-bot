@@ -8,10 +8,10 @@ from src.database.models import UserSkill
 def get_practice_keyboard() -> InlineKeyboardMarkup:
     """Главное меню практики"""
     buttons = [
-        [InlineKeyboardButton("🎯 Сегодняшний фокус", callback_data="practice_focus")],
-        [InlineKeyboardButton("📋 Мои навыки", callback_data="practice_skills")],
-        [InlineKeyboardButton("➕ Добавить навык", callback_data="practice_add")],
-        [InlineKeyboardButton("🔙 Назад", callback_data="menu_main")],
+        [InlineKeyboardButton(text="🎯 Сегодняшний фокус", callback_data="practice_focus")],
+        [InlineKeyboardButton(text="📋 Мои навыки", callback_data="practice_skills")],
+        [InlineKeyboardButton(text="➕ Добавить навык", callback_data="practice_add")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="menu_main")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -32,9 +32,9 @@ def get_skills_keyboard(user_skills: List[UserSkill], show_complete: bool = Fals
         if user_skill.status == "active":
             callback_data = f"skill_complete:{user_skill.skill_id}"
         
-        buttons.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
+        buttons.append([InlineKeyboardButton(text=button_text, callback_data=callback_data)])
     
-    buttons.append([InlineKeyboardButton("🔙 Назад", callback_data="menu_practice")])
+    buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="menu_practice")])
     
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -62,11 +62,11 @@ def get_focus_keyboard(
         else:
             continue  # Пропускаем, если достигнут лимит
         
-        buttons.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
+        buttons.append([InlineKeyboardButton(text=button_text, callback_data=callback_data)])
     
     buttons.append([
-        InlineKeyboardButton("💾 Сохранить фокус", callback_data="focus_save"),
-        InlineKeyboardButton("🔙 Назад", callback_data="menu_practice"),
+        InlineKeyboardButton(text="💾 Сохранить фокус", callback_data="focus_save"),
+        InlineKeyboardButton(text="🔙 Назад", callback_data="menu_practice"),
     ])
     
     return InlineKeyboardMarkup(inline_keyboard=buttons)

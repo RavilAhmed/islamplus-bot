@@ -1,10 +1,46 @@
 """Обработчики для настроек"""
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 
 from src.keyboards.main_menu import get_main_menu_keyboard
 
 router = Router()
+
+
+@router.message(F.text == "⚙️ Настройки")
+async def cmd_menu_settings(message: Message):
+    """Настройки (текстовая кнопка)"""
+    text = (
+        "⚙️ **Настройки**\n\n"
+        "Здесь вы сможете настроить:\n"
+        "🔔 Уведомления\n"
+        "⏰ Время напоминаний\n"
+        "🌍 Язык интерфейса\n\n"
+        "Функция в разработке..."
+    )
+    
+    await message.answer(
+        text,
+        parse_mode="Markdown",
+    )
+
+
+@router.message(F.text == "📚 Библиотека")
+async def cmd_menu_library(message: Message):
+    """Библиотека (текстовая кнопка)"""
+    text = (
+        "📚 **Библиотека микроконтента**\n\n"
+        "Здесь будут доступны:\n"
+        "📖 Статьи\n"
+        "🎥 Короткие видео\n"
+        "🎧 Аудио-лекции\n\n"
+        "Функция в разработке..."
+    )
+    
+    await message.answer(
+        text,
+        parse_mode="Markdown",
+    )
 
 
 @router.callback_query(F.data == "menu_settings")

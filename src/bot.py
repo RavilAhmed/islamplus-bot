@@ -14,6 +14,7 @@ from src.handlers import (
     register_quiz_handlers,
     register_progress_handlers,
     register_settings_handlers,
+    register_quran_handlers,
 )
 
 # Настройка логирования
@@ -57,6 +58,7 @@ async def main():
     register_quiz_handlers(dp)
     register_progress_handlers(dp)
     register_settings_handlers(dp)
+    register_quran_handlers(dp)
     
     # Запуск бота
     logger.info("Запуск бота...")

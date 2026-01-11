@@ -1,16 +1,24 @@
 """Главное меню"""
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 
 
-def get_main_menu_keyboard() -> InlineKeyboardMarkup:
-    """Главное меню"""
-    buttons = [
-        [InlineKeyboardButton(text="🏁 Мои курсы", callback_data="menu_courses")],
-        [InlineKeyboardButton(text="🛠 Практика", callback_data="menu_practice")],
-        [InlineKeyboardButton(text="📚 Библиотека", callback_data="menu_library")],
-        [InlineKeyboardButton(text="🧠 Тест", callback_data="menu_test")],
-        [InlineKeyboardButton(text="📈 Прогресс", callback_data="menu_progress")],
-        [InlineKeyboardButton(text="⚙️ Настройки", callback_data="menu_settings")],
-    ]
-    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
+    """Главное меню (обычная клавиатура)"""
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🏁 Мои курсы")],
+            [KeyboardButton(text="🛠 Практика")],
+            [KeyboardButton(text="🎧 Слушать Коран и лекции")],
+            [KeyboardButton(text="📚 Библиотека")],
+            [KeyboardButton(text="🧠 Тест")],
+            [KeyboardButton(text="📈 Прогресс")],
+            [KeyboardButton(text="⚙️ Настройки")],
+        ],
+        resize_keyboard=True,
+    )
     return keyboard
+
+
+def remove_keyboard() -> ReplyKeyboardRemove:
+    """Убрать клавиатуру"""
+    return ReplyKeyboardRemove()

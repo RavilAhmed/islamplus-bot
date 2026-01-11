@@ -17,6 +17,27 @@ from src.keyboards.courses import get_courses_keyboard, get_course_detail_keyboa
 router = Router()
 
 
+@router.message(F.text == "🏁 Мои курсы")
+async def cmd_menu_courses(message: Message):
+    """Список курсов (текстовая кнопка)"""
+    async for session in get_db_session():
+        courses = await get_active_courses(session)
+        
+        if not courses:
+            await message.answer(
+                "📚 Курсы\n\nК сожалению, пока нет доступных курсов.",
+                reply_markup=get_courses_keyboard([], back_button=True),
+            )
+            return
+        
+        text = "📚 **Доступные курсы:**\n\nВыберите курс для изучения:"
+        await message.answer(
+            text,
+            reply_markup=get_courses_keyboard(courses, back_button=True),
+            parse_mode="Markdown",
+        )
+
+
 @router.callback_query(F.data == "menu_courses")
 async def callback_menu_courses(callback: CallbackQuery):
     """Список курсов"""

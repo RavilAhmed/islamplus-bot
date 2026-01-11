@@ -16,6 +16,24 @@ from src.keyboards.practice import get_practice_keyboard, get_skills_keyboard, g
 router = Router()
 
 
+@router.message(F.text == "🛠 Практика")
+async def cmd_menu_practice(message: Message):
+    """Главное меню практики (текстовая кнопка)"""
+    text = (
+        "🛠 **Практика**\n\n"
+        "Развивайте навыки и формируйте полезные привычки.\n\n"
+        "🎯 **Сегодняшний фокус** — выберите до 5 навыков для ежедневной практики\n"
+        "📋 **Мои навыки** — список всех ваших навыков\n"
+        "➕ **Добавить навык** — выбрать новый навык из каталога"
+    )
+    
+    await message.answer(
+        text,
+        reply_markup=get_practice_keyboard(),
+        parse_mode="Markdown",
+    )
+
+
 @router.callback_query(F.data == "menu_practice")
 async def callback_menu_practice(callback: CallbackQuery):
     """Главное меню практики"""

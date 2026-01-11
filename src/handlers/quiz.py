@@ -18,6 +18,27 @@ router = Router()
 user_current_questions = {}
 
 
+@router.message(F.text == "🧠 Тест")
+async def cmd_menu_test(message: Message):
+    """Главное меню тестов (текстовая кнопка)"""
+    async for session in get_db_session():
+        categories = await get_categories(session)
+        
+        text = (
+            "🧠 **Большой Тест**\n\n"
+            "Проверьте свои знания по исламу!\n\n"
+            "♾️ **Бесконечный вызов** — отвечайте на вопросы без ограничений\n"
+            "📅 **Ежедневная викторина** — 5 вопросов каждый день\n"
+            "📚 **Тематический раунд** — вопросы по выбранной категории"
+        )
+        
+        await message.answer(
+            text,
+            reply_markup=get_quiz_mode_keyboard(categories),
+            parse_mode="Markdown",
+        )
+
+
 @router.callback_query(F.data == "menu_test")
 async def callback_menu_test(callback: CallbackQuery):
     """Главное меню тестов"""

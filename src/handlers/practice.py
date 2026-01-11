@@ -1,6 +1,6 @@
 """Обработчики для практики"""
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from datetime import date
 
 from src.database.base import get_db_session

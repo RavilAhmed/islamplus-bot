@@ -128,11 +128,8 @@ async def callback_menu_progress(callback: CallbackQuery):
                 f"   Серия: {quiz_progress.current_streak}\n"
             )
         
-        await callback.message.edit_text(
-            text,
-            reply_markup=get_main_menu_keyboard(),
-            parse_mode="Markdown",
-        )
+        await callback.message.delete()
+        await callback.message.answer(text, parse_mode="Markdown")
         await callback.answer()
 
 

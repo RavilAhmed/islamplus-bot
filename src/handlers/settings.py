@@ -55,11 +55,8 @@ async def callback_menu_settings(callback: CallbackQuery):
         "Функция в разработке..."
     )
     
-    await callback.message.edit_text(
-        text,
-        reply_markup=get_main_menu_keyboard(),
-        parse_mode="Markdown",
-    )
+    await callback.message.delete()
+    await callback.message.answer(text, parse_mode="Markdown")
     await callback.answer()
 
 
@@ -75,11 +72,8 @@ async def callback_menu_library(callback: CallbackQuery):
         "Функция в разработке..."
     )
     
-    await callback.message.edit_text(
-        text,
-        reply_markup=get_main_menu_keyboard(),
-        parse_mode="Markdown",
-    )
+    await callback.message.delete()
+    await callback.message.answer(text, parse_mode="Markdown")
     await callback.answer()
 
 

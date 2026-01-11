@@ -23,3 +23,7 @@ alembic/versions/*.pyc
 # Системные файлы
 .DS_Store
 Thumbs.db
+
+# Audio files (too large for git)
+tolkovanie_assaadi/
+*.mp3

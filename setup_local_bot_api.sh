@@ -50,9 +50,9 @@ sudo docker run -d \
   --restart=always \
   -v /var/lib/telegram-bot-api:/var/lib/telegram-bot-api \
   -p 8081:8081 \
+  -e TELEGRAM_API_ID="$API_ID" \
+  -e TELEGRAM_API_HASH="$API_HASH" \
   aiogram/telegram-bot-api:latest \
-  --api-id="$API_ID" \
-  --api-hash="$API_HASH" \
   --local
 
 echo "✅ Локальный Bot API запущен!"

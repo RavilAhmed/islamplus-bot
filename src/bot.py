@@ -50,8 +50,11 @@ async def main():
         # Для локального Bot API используем TelegramAPIServer
         from aiogram.client.telegram import TelegramAPIServer
         
+        # Убираем /bot из URL если есть, так как from_base добавляет его автоматически
+        base_url = config.BOT_API_URL.rstrip('/bot').rstrip('/')
+        
         # Создаем кастомный API сервер
-        api_server = TelegramAPIServer.from_base(config.BOT_API_URL, is_local=True)
+        api_server = TelegramAPIServer.from_base(base_url, is_local=True)
         session = AiohttpSession(api=api_server)
         
         bot = Bot(
@@ -59,7 +62,7 @@ async def main():
             session=session,
             default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
         )
-        logger.info(f"Используется локальный Bot API: {config.BOT_API_URL}")
+        logger.info(f"Используется локальный Bot API: {base_url}")
     else:
         bot = Bot(
             token=config.BOT_TOKEN,

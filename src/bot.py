@@ -5,7 +5,6 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.client.session.aiohttp import AiohttpSession
-from aiogram.client.api import API
 
 from src.config import config
 from src.database.base import init_db
@@ -48,8 +47,10 @@ async def main():
     # Создание бота и диспетчера
     # Используем локальный Bot API, если указан
     if config.BOT_API_URL:
-        api = API(base_url=config.BOT_API_URL, is_local=True)
-        session = AiohttpSession(api=api)
+        # Для локального Bot API используем кастомную сессию
+        session = AiohttpSession()
+        # Устанавливаем базовый URL для API
+        session.api.base = config.BOT_API_URL
         bot = Bot(
             token=config.BOT_TOKEN,
             session=session,

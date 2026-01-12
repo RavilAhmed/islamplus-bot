@@ -47,9 +47,13 @@ async def main():
     # Создание бота и диспетчера
     # Используем локальный Bot API, если указан
     if config.BOT_API_URL:
-        # Для локального Bot API создаем сессию с кастомным base URL
-        # В aiogram 3.x нужно передать base_url при создании сессии
-        session = AiohttpSession(api=Bot.api_session(api=config.BOT_API_URL))
+        # Для локального Bot API используем TelegramAPIServer
+        from aiogram.client.telegram import TelegramAPIServer
+        
+        # Создаем кастомный API сервер
+        api_server = TelegramAPIServer.from_base(config.BOT_API_URL, is_local=True)
+        session = AiohttpSession(api=api_server)
+        
         bot = Bot(
             token=config.BOT_TOKEN,
             session=session,

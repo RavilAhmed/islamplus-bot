@@ -4,6 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.client.session.aiohttp import AiohttpSession
 
 from src.config import config
 from src.database.base import init_db
@@ -44,16 +45,20 @@ async def main():
         return
     
     # Создание бота и диспетчера
-    bot_kwargs = {
-        "token": config.BOT_TOKEN,
-        "default": DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
-    }
     # Используем локальный Bot API, если указан
     if config.BOT_API_URL:
-        bot_kwargs["base_url"] = config.BOT_API_URL
+        session = AiohttpSession(api=Bot.api_session(api=config.BOT_API_URL))
+        bot = Bot(
+            token=config.BOT_TOKEN,
+            session=session,
+            default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
+        )
         logger.info(f"Используется локальный Bot API: {config.BOT_API_URL}")
-    
-    bot = Bot(**bot_kwargs)
+    else:
+        bot = Bot(
+            token=config.BOT_TOKEN,
+            default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
+        )
     dp = Dispatcher()
     
     # Регистрация обработчиков

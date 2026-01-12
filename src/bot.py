@@ -48,9 +48,8 @@ async def main():
     # Используем локальный Bot API, если указан
     if config.BOT_API_URL:
         # Для локального Bot API создаем сессию с кастомным base URL
-        session = AiohttpSession()
-        # Устанавливаем base URL для API
-        session.api.base = config.BOT_API_URL
+        # В aiogram 3.x нужно передать base_url при создании сессии
+        session = AiohttpSession(api=Bot.api_session(api=config.BOT_API_URL))
         bot = Bot(
             token=config.BOT_TOKEN,
             session=session,

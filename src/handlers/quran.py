@@ -240,47 +240,50 @@ async def callback_sura(callback: CallbackQuery):
     if sura.get("description"):
         text += f"\n\n{sura['description']}"
     
-    if audio_path.exists():
-        try:
-            # Сохраняем chat_id перед удалением сообщения
-            chat_id = callback.message.chat.id
-            
-            # Показываем индикатор отправки
-            await callback.message.delete()
-            loading_message = await callback.message.bot.send_message(
-                chat_id=chat_id,
-                text="⏳ Идет отправка файла..."
-            )
-            
-            # Отправляем файл
-            audio_file = FSInputFile(audio_path)
-            await callback.message.bot.send_audio(
-                chat_id=chat_id,
-                audio=audio_file,
-                title=f"Сура {sura_num}. {sura['name_ar']}",
-                performer="Толкование ас-Саади",
-                caption=text,
-            )
-            
-            # Удаляем индикатор отправки
-            await loading_message.delete()
-            await callback.answer()
-        except Exception as e:
-            logger.error(f"Ошибка отправки аудиофайла {sura['file']}: {e}", exc_info=True)
-            chat_id = callback.message.chat.id
-            await callback.message.bot.send_message(
-                chat_id=chat_id,
-                text=f"{text}\n\n❌ Ошибка отправки файла.\n\nРазмер файла: {audio_path.stat().st_size / (1024*1024):.1f} MB\n\nОшибка: {str(e)}"
-            )
-            await callback.answer("Ошибка отправки файла", show_alert=True)
-    else:
-        # Если файл не найден, отправляем новое сообщение
+    # Проверяем существование файла
+    if not audio_path.exists():
+        logger.error(f"Аудиофайл не найден: {audio_path} (сура {sura_num})")
+        await callback.answer("❌ Аудиофайл не найден на сервере", show_alert=True)
+        return
+    
+    try:
+        # Сохраняем chat_id перед удалением сообщения
         chat_id = callback.message.chat.id
+        
+        # Показываем индикатор отправки
+        await callback.message.delete()
+        loading_message = await callback.message.bot.send_message(
+            chat_id=chat_id,
+            text="⏳ Идет отправка файла..."
+        )
+        
+        # Отправляем файл
+        audio_file = FSInputFile(audio_path)
+        await callback.message.bot.send_audio(
+            chat_id=chat_id,
+            audio=audio_file,
+            title=f"Сура {sura_num}. {sura['name_ar']}",
+            performer="Толкование ас-Саади",
+            caption=text,
+        )
+        
+        # Удаляем индикатор отправки
+        await loading_message.delete()
+        await callback.answer()
+    except Exception as e:
+        logger.error(f"Ошибка отправки аудиофайла {sura['file']} (сура {sura_num}): {e}", exc_info=True)
+        chat_id = callback.message.chat.id
+        try:
+            file_size = audio_path.stat().st_size / (1024*1024)
+            error_text = f"{text}\n\n❌ Не удалось отправить файл.\n\nРазмер файла: {file_size:.1f} MB"
+        except:
+            error_text = f"{text}\n\n❌ Не удалось отправить файл."
+        
         await callback.message.bot.send_message(
             chat_id=chat_id,
-            text=f"{text}\n\n❌ Аудиофайл не найден: {audio_path}"
+            text=error_text
         )
-        await callback.answer("Аудиофайл не найден", show_alert=True)
+        await callback.answer("Ошибка отправки файла", show_alert=True)
 
 
 def register_quran_handlers(dp):

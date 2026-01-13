@@ -1,4 +1,5 @@
 """Обработчики для Корана и лекций"""
+import asyncio
 import logging
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
@@ -246,12 +247,15 @@ async def callback_sura(callback: CallbackQuery):
         await callback.answer("❌ Аудиофайл не найден на сервере", show_alert=True)
         return
     
+    # Сохраняем chat_id перед удалением сообщения
+    chat_id = callback.message.chat.id
+    
+    # Показываем индикатор отправки
+    await callback.message.delete()
+    loading_message = None
+    file_sent = False
+    
     try:
-        # Сохраняем chat_id перед удалением сообщения
-        chat_id = callback.message.chat.id
-        
-        # Показываем индикатор отправки
-        await callback.message.delete()
         loading_message = await callback.message.bot.send_message(
             chat_id=chat_id,
             text="⏳ Идет отправка файла..."
@@ -259,7 +263,7 @@ async def callback_sura(callback: CallbackQuery):
         
         # Отправляем файл
         audio_file = FSInputFile(audio_path)
-        await callback.message.bot.send_audio(
+        sent_message = await callback.message.bot.send_audio(
             chat_id=chat_id,
             audio=audio_file,
             title=f"Сура {sura_num}. {sura['name_ar']}",
@@ -267,23 +271,42 @@ async def callback_sura(callback: CallbackQuery):
             caption=text,
         )
         
-        # Удаляем индикатор отправки
-        await loading_message.delete()
-        await callback.answer()
+        # Если send_audio вернул объект Message, значит файл отправлен успешно
+        if sent_message:
+            file_sent = True
+        
     except Exception as e:
-        logger.error(f"Ошибка отправки аудиофайла {sura['file']} (сура {sura_num}): {e}", exc_info=True)
-        chat_id = callback.message.chat.id
+        error_msg = str(e).lower()
+        # Проверяем, не является ли это ошибкой таймаута, но файл все равно мог отправиться
+        if "timeout" in error_msg or "query is too old" in error_msg or "response timeout expired" in error_msg:
+            # При таймауте файл может быть уже отправлен, считаем что отправлен
+            file_sent = True
+            logger.warning(f"Таймаут при отправке {sura['file']}, но файл скорее всего отправлен: {e}")
+        else:
+            logger.error(f"Ошибка отправки аудиофайла {sura['file']} (сура {sura_num}): {e}", exc_info=True)
+    
+    # Удаляем индикатор отправки (игнорируем ошибки)
+    if loading_message:
+        try:
+            await loading_message.delete()
+        except:
+            pass
+    
+    # Показываем ошибку только если файл НЕ был отправлен
+    if not file_sent:
         try:
             file_size = audio_path.stat().st_size / (1024*1024)
-            error_text = f"{text}\n\n❌ Не удалось отправить файл.\n\nРазмер файла: {file_size:.1f} MB"
+            error_text = f"❌ Ошибка отправки файла.\n\nРазмер файла: {file_size:.1f} MB"
         except:
-            error_text = f"{text}\n\n❌ Не удалось отправить файл."
+            error_text = "❌ Ошибка отправки файла. Пожалуйста, попробуйте позже."
         
         await callback.message.bot.send_message(
             chat_id=chat_id,
             text=error_text
         )
         await callback.answer("Ошибка отправки файла", show_alert=True)
+    else:
+        await callback.answer()
 
 
 def register_quran_handlers(dp):

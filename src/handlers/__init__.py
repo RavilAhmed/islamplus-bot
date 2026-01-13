@@ -6,6 +6,7 @@ from .quiz import register_quiz_handlers
 from .progress import register_progress_handlers
 from .settings import register_settings_handlers
 from .quran import register_quran_handlers
+from .broadcast import register_broadcast_handlers
 
 __all__ = [
     "register_start_handlers",
@@ -15,4 +16,5 @@ __all__ = [
     "register_progress_handlers",
     "register_settings_handlers",
     "register_quran_handlers",
+    "register_broadcast_handlers",
 ]

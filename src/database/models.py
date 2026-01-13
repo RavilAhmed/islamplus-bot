@@ -76,9 +76,13 @@ class Lesson(Base):
     pdf_url: Mapped[Optional[str]] = mapped_column(Text)  # ссылка на PDF
     quiz_questions: Mapped[Optional[Dict]] = mapped_column(JSON)  # вопросы для проверки
     unlock_condition: Mapped[str] = mapped_column(String(50), default="previous_completed")
+    additional_materials: Mapped[Optional[Dict]] = mapped_column(JSON, default=lambda: {})  # дополнительные материалы (видео, статьи и т.д.)
+    lesson_config: Mapped[Optional[Dict]] = mapped_column(JSON, default=lambda: {})  # конфигурация урока (механика, требования и т.д.)
     
     # Relationships
     course: Mapped["Course"] = relationship(back_populates="lessons")
+    user_progress: Mapped[List["UserLessonProgress"]] = relationship(back_populates="lesson", cascade="all, delete-orphan")
+    quiz_results: Mapped[List["UserLessonQuiz"]] = relationship(back_populates="lesson", cascade="all, delete-orphan")
     
     __table_args__ = (
         Index("idx_lesson_course_day", "course_id", "day_number"),
@@ -248,3 +252,49 @@ class UserAchievement(Base):
     # Relationships
     user: Mapped["User"] = relationship(back_populates="achievements")
     achievement: Mapped["Achievement"] = relationship(back_populates="user_achievements")
+
+
+class UserLessonProgress(Base):
+    """Прогресс пользователя по уроку"""
+    __tablename__ = "user_lesson_progress"
+    
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    lesson_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="not_started")  # 'not_started', 'studied', 'quiz_passed', 'completed'
+    progress_data: Mapped[Dict] = mapped_column(JSON, default=lambda: {})  # гибкие данные прогресса
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    last_activity: Mapped[Optional[datetime]] = mapped_column(DateTime, server_default=func.now())
+    
+    # Relationships
+    user: Mapped["User"] = relationship()
+    lesson: Mapped["Lesson"] = relationship(back_populates="user_progress")
+    
+    __table_args__ = (
+        UniqueConstraint("user_id", "lesson_id", name="uq_user_lesson"),
+        Index("idx_user_lesson", "user_id", "lesson_id"),
+    )
+
+
+class UserLessonQuiz(Base):
+    """Результаты тестирования по уроку"""
+    __tablename__ = "user_lesson_quiz"
+    
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    lesson_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    last_score: Mapped[Optional[int]] = mapped_column(Integer)  # процент правильных ответов
+    passed: Mapped[bool] = mapped_column(Boolean, default=False)
+    answers: Mapped[Dict] = mapped_column(JSON, default=lambda: {})  # ответы пользователя
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    
+    # Relationships
+    user: Mapped["User"] = relationship()
+    lesson: Mapped["Lesson"] = relationship(back_populates="quiz_results")
+    
+    __table_args__ = (
+        UniqueConstraint("user_id", "lesson_id", name="uq_user_lesson_quiz"),
+        Index("idx_user_lesson_quiz", "user_id", "lesson_id"),
+    )

@@ -16,7 +16,9 @@ from src.handlers import (
     register_progress_handlers,
     register_settings_handlers,
     register_quran_handlers,
+    register_broadcast_handlers,
 )
+from src.services.notification_service import notification_worker
 
 # Настройка логирования
 logging.basicConfig(
@@ -51,7 +53,14 @@ async def main():
         from aiogram.client.telegram import TelegramAPIServer
         
         # Убираем /bot из URL если есть, так как from_base добавляет его автоматически
+        # Также убираем http:// или https:// если есть
         base_url = config.BOT_API_URL.rstrip('/bot').rstrip('/')
+        if base_url.startswith('http://'):
+            base_url = base_url[7:]
+        elif base_url.startswith('https://'):
+            base_url = base_url[8:]
+        # Добавляем http:// обратно для from_base
+        base_url = f"http://{base_url}" if not base_url.startswith('http') else base_url
         
         # Создаем кастомный API сервер
         api_server = TelegramAPIServer.from_base(base_url, is_local=True)
@@ -79,6 +88,11 @@ async def main():
     register_progress_handlers(dp)
     register_settings_handlers(dp)
     register_quran_handlers(dp)
+    register_broadcast_handlers(dp)
+    
+    # Запуск планировщика уведомлений в фоне
+    logger.info("Запуск планировщика уведомлений...")
+    asyncio.create_task(notification_worker(bot))
     
     # Запуск бота
     logger.info("Запуск бота...")

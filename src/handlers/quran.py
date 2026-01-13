@@ -242,13 +242,20 @@ async def callback_sura(callback: CallbackQuery):
     
     if audio_path.exists():
         try:
+            # Сохраняем chat_id перед удалением сообщения
+            chat_id = callback.message.chat.id
+            
             # Показываем индикатор отправки
             await callback.message.delete()
-            loading_message = await callback.message.answer("⏳ Идет отправка файла...")
+            loading_message = await callback.message.bot.send_message(
+                chat_id=chat_id,
+                text="⏳ Идет отправка файла..."
+            )
             
             # Отправляем файл
             audio_file = FSInputFile(audio_path)
-            await callback.message.answer_audio(
+            await callback.message.bot.send_audio(
+                chat_id=chat_id,
                 audio=audio_file,
                 title=f"Сура {sura_num}. {sura['name_ar']}",
                 performer="Толкование ас-Саади",
@@ -260,13 +267,18 @@ async def callback_sura(callback: CallbackQuery):
             await callback.answer()
         except Exception as e:
             logger.error(f"Ошибка отправки аудиофайла {sura['file']}: {e}", exc_info=True)
-            await callback.message.edit_text(
-                f"{text}\n\n❌ Ошибка отправки файла. Файл слишком большой (максимум 50MB для Telegram).\n\nРазмер файла: {audio_path.stat().st_size / (1024*1024):.1f} MB",
+            chat_id = callback.message.chat.id
+            await callback.message.bot.send_message(
+                chat_id=chat_id,
+                text=f"{text}\n\n❌ Ошибка отправки файла.\n\nРазмер файла: {audio_path.stat().st_size / (1024*1024):.1f} MB\n\nОшибка: {str(e)}"
             )
             await callback.answer("Ошибка отправки файла", show_alert=True)
     else:
-        await callback.message.edit_text(
-            f"{text}\n\n❌ Аудиофайл не найден: {audio_path}",
+        # Если файл не найден, отправляем новое сообщение
+        chat_id = callback.message.chat.id
+        await callback.message.bot.send_message(
+            chat_id=chat_id,
+            text=f"{text}\n\n❌ Аудиофайл не найден: {audio_path}"
         )
         await callback.answer("Аудиофайл не найден", show_alert=True)
 
